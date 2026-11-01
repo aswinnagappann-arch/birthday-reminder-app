@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  birthday-reminder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: birthday_reminder_app
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - REMINDER_HOUR=9
+      - REMINDER_MINUTE=0
+      - APP_SECRET_KEY=prod-vault-secret-bday-key-2026
+    volumes:
+      - birthday_data:/app/backend/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  birthday_data:
+    driver: local
